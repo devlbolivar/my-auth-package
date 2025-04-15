@@ -1,10 +1,179 @@
+# my-auth-package
+
+A flexible and decoupled authentication package for React applications. Provides ready-to-use authentication components, context, and API utilities.
+
+## Features
+
+- 🔒 Complete authentication flow (login, register, password reset, email verification)
+- 🔌 Fully configurable endpoints and base URL
+- 🎨 Customizable UI components
+- 📦 TypeScript support
+- 🛠️ Various token storage options (localStorage, sessionStorage, etc.)
+- 🔄 Token refresh handling
+
+## Installation
+
+```bash
+npm install my-auth-package
+# or
+yarn add my-auth-package
+```
+
+## Quick Start
+
+1. Configure the authentication service:
+
+```jsx
+import { configureAuth } from 'my-auth-package';
+
+configureAuth({
+  baseUrl: 'https://api.myapp.com',
+  tokenStorage: 'localStorage',
+  // Optionally override default endpoints
+  endpoints: {
+    login: '/custom/login',
+    // ...
+  },
+});
+```
+
+2. Wrap your application with the `AuthProvider`:
+
+```jsx
+import { AuthProvider } from 'my-auth-package';
+
+function App() {
+  return (
+    <AuthProvider
+      onLoginSuccess={user => console.log('Logged in:', user)}
+      onLogoutSuccess={() => console.log('Logged out')}
+    >
+      <YourApplication />
+    </AuthProvider>
+  );
+}
+```
+
+3. Use the authentication components in your app:
+
+```jsx
+import { LoginForm, RegisterForm, PasswordReset } from 'my-auth-package';
+
+function AuthPage() {
+  const [view, setView] = useState('login');
+
+  return (
+    <div>
+      {view === 'login' && (
+        <LoginForm
+          onSuccess={() => console.log('Login successful')}
+          onError={error => console.error('Login failed:', error)}
+        />
+      )}
+
+      {view === 'register' && (
+        <RegisterForm
+          onSuccess={() => console.log('Registration successful')}
+        />
+      )}
+
+      {view === 'reset' && (
+        <PasswordReset onSuccess={() => console.log('Reset email sent')} />
+      )}
+    </div>
+  );
+}
+```
+
+4. Use the auth hook to access authentication state and methods:
+
+```jsx
+import { useAuth } from 'my-auth-package';
+
+function UserProfile() {
+  const { user, isAuthenticated, logout } = useAuth();
+
+  if (!isAuthenticated) {
+    return <p>Please log in</p>;
+  }
+
+  return (
+    <div>
+      <h1>Welcome, {user.name}!</h1>
+      <button onClick={logout}>Log out</button>
+    </div>
+  );
+}
+```
+
+## API Reference
+
+### Components
+
+- `<AuthProvider>` - Main provider for authentication context
+- `<LoginForm>` - Pre-built login form component
+- `<RegisterForm>` - Pre-built registration form component
+- `<PasswordReset>` - Password reset form component
+- `<VerificationPrompt>` - Email verification component
+
+### Hooks
+
+- `useAuth()` - Hook to access authentication context
+
+### Configuration
+
+```typescript
+configureAuth({
+  baseUrl: string;
+  endpoints?: {
+    login: string;
+    register: string;
+    logout: string;
+    refresh: string;
+    passwordReset: string;
+    verifyEmail: string;
+  };
+  tokenStorage: 'localStorage' | 'sessionStorage' | 'cookie' | 'memory';
+})
+```
+
+## Customization
+
+You can customize the components by styling them directly or creating your own components using the `useAuth` hook:
+
+```jsx
+import { useAuth } from 'my-auth-package';
+
+function CustomLoginForm() {
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    try {
+      await login({ email, password });
+      // Success handling
+    } catch (error) {
+      // Error handling
+    }
+  };
+
+  return <form onSubmit={handleSubmit}>{/* Your custom form elements */}</form>;
+}
+```
+
+## License
+
+MIT
+
 # TSDX React User Guide
 
-Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
+Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let's get you oriented with what's here and how to use it.
 
-> This TSDX setup is meant for developing React component libraries (not apps!) that can be published to NPM. If you’re looking to build a React-based app, you should use `create-react-app`, `razzle`, `nextjs`, `gatsby`, or `react-static`.
+> This TSDX setup is meant for developing React component libraries (not apps!) that can be published to NPM. If you're looking to build a React-based app, you should use `create-react-app`, `razzle`, `nextjs`, `gatsby`, or `react-static`.
 
-> If you’re new to TypeScript and React, checkout [this handy cheatsheet](https://github.com/sw-yx/react-typescript-cheatsheet/)
+> If you're new to TypeScript and React, checkout [this handy cheatsheet](https://github.com/sw-yx/react-typescript-cheatsheet/)
 
 ## Commands
 
