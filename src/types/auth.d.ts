@@ -75,6 +75,7 @@ export interface AuthContextType {
     options?: AxiosRequestConfig
   ) => Promise<void>;
   refreshToken: (options?: AxiosRequestConfig) => Promise<void>;
+  resendCode: (email: string) => Promise<void>;
 }
 
 export interface AuthProviderProps {

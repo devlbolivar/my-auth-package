@@ -1,26 +1,4 @@
-// src/api/authConfig.ts
-interface AuthConfig {
-  baseUrl: string;
-  endpoints: {
-    login: string;
-    register: string;
-    logout: string;
-    refresh: string;
-    passwordReset: string;
-    verifyEmail: string;
-    resendCode: string;
-  };
-  tokenStorage: 'localStorage' | 'sessionStorage' | 'cookie' | 'memory';
-  tokenExpiration: number; // in seconds
-  cookieOptions: {
-    secure: boolean;
-    sameSite: 'strict' | 'lax' | 'none';
-    domain?: string;
-    path?: string;
-  };
-  autoRefresh: boolean;
-  refreshBeforeExpiration: number; // in seconds
-}
+import type { AuthConfig } from '../types/auth';
 
 const defaultConfig: AuthConfig = {
   baseUrl: '',
@@ -42,6 +20,10 @@ const defaultConfig: AuthConfig = {
   },
   autoRefresh: true,
   refreshBeforeExpiration: 300, // refresh 5 minutes before expiration
+  token: {
+    headerName: 'Authorization',
+    csrfHeaderName: 'X-CSRF-Token'
+  }
 };
 
 // In-memory storage for tokens when using memory storage option
@@ -57,6 +39,11 @@ const memoryStorage: {
 
 let authConfig: AuthConfig = { ...defaultConfig };
 
+/**
+ * Configures the authentication service with custom settings
+ * @param config - Partial configuration object to override defaults
+ * @throws {Error} If invalid token storage type is provided
+ */
 export const configureAuth = (config: Partial<AuthConfig>): void => {
   // Validate tokenStorage if provided
   if (
@@ -70,8 +57,7 @@ export const configureAuth = (config: Partial<AuthConfig>): void => {
 
   authConfig = { ...authConfig, ...config };
 
-  // If baseUrl has a trailing slash and the endpoints have leading slashes,
-  // clean that up to avoid double slashes
+  // Clean up URL slashes to avoid double slashes
   if (authConfig.baseUrl.endsWith('/')) {
     Object.keys(authConfig.endpoints).forEach(key => {
       const endpoint =
@@ -85,15 +71,28 @@ export const configureAuth = (config: Partial<AuthConfig>): void => {
   }
 };
 
+/**
+ * Returns the current auth configuration
+ * @returns A copy of the current auth configuration
+ */
 export const getAuthConfig = (): AuthConfig => {
   return { ...authConfig };
 };
 
+/**
+ * Returns the full URL for a given endpoint
+ * @param endpoint - The endpoint key from the configuration
+ * @returns The complete URL for the endpoint
+ */
 export const getFullUrl = (endpoint: keyof AuthConfig['endpoints']): string => {
   const config = getAuthConfig();
   return `${config.baseUrl}${config.endpoints[endpoint]}`;
 };
 
+/**
+ * Returns the cookie expiration date based on the current configuration
+ * @returns Date object representing when the cookie should expire
+ */
 export const getCookieExpirationDate = (): Date => {
   const config = getAuthConfig();
   const date = new Date();
@@ -101,4 +100,8 @@ export const getCookieExpirationDate = (): Date => {
   return date;
 };
 
-export const getMemoryStorage = () => memoryStorage;
+/**
+ * Returns the memory storage object for token storage
+ * @returns The memory storage object
+ */
+export const getMemoryStorage = () => memoryStorage; 
